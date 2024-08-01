@@ -1,25 +1,25 @@
 steps:
   # Build Docker image for the text generation App
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/text-generation-app:$SHORT_SHA', './frontend']
-  
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/text-generation-app:latest', './frontend']
+
   # Push image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/text-generation-app:$SHORT_SHA']
-  
+    args: ['push', 'gcr.io/$PROJECT_ID/text-generation-app:latest']
+
   # Create or update deployment for text generation app
   - name: 'gcr.io/cloud-builders/kubectl'
     args: ['apply', '-f', './deployement/text-deployment.yaml']
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=newcluster'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=my-cluster'
 
   # Update the deployment with the new image
   - name: 'gcr.io/cloud-builders/kubectl'
-    args: ['set', 'image', 'deployment/text-generation-app', 'text-generation-app=gcr.io/$PROJECT_ID/text-generation-app:$SHORT_SHA']
+    args: ['set', 'image', 'deployment/text-generation-app', 'text-generation-app=gcr.io/$PROJECT_ID/text-generation-app:latest']
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=newcluster'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=my-cluster'
 
 options:
   logging: CLOUD_LOGGING_ONLY
